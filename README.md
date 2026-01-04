@@ -1,34 +1,22 @@
-# Flask + MongoDB + Docker + Kubernetes (Minikube)
+🐍 Flask + MongoDB + Docker + Kubernetes (Minikube)
 
-This project demonstrates a **Flask backend application** connected with **MongoDB**, containerized using **Docker**, and deployed on **Kubernetes** using **Minikube**.
+This project demonstrates a Flask backend application connected with MongoDB, containerized using Docker, and deployed on Kubernetes using Minikube.
 
-It allows users to insert and retrieve data via REST endpoints and demonstrates **replica scaling**, **service discovery**, and **container orchestration**.
+It supports inserting and retrieving data via REST endpoints and demonstrates replica scaling, service discovery, and container orchestration.
 
----
-
-## 🗂 Project Structure
-
+🗂 Project Structure
 flask-mongo-k8s/
 ├── app/
-│ ├── app.py # Flask application code
-│ ├── Dockerfile # Dockerfile for Flask app
-│ └── requirements.txt # Python dependencies
+│   ├── app.py
+│   ├── Dockerfile
+│   └── requirements.txt
 ├── k8s/
-│ ├── flask.yaml # Flask Deployment and Service YAML
-│ └── mongodb.yaml # MongoDB Deployment and Service YAML
-├── deploy.bat # Optional deployment script for Windows
-└── README.md # This file
+│   ├── flask.yaml
+│   └── mongodb.yaml
+├── deploy.bat
+└── README.md
 
-yaml
-Copy code
-
----
-
-## 🐳 Dockerfile for Flask Application
-
-Below is the Dockerfile used to containerize the Flask application:
-
-```dockerfile
+🐳 Dockerfile for Flask Application
 # Use official Python image
 FROM python:3.11-slim
 
@@ -45,150 +33,54 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Expose Flask port
 EXPOSE 5000
 
-# Command to run the app
+# Run the Flask app
 CMD ["python", "app.py"]
-Note: Ensure Flask app listens on 0.0.0.0 to allow access from Kubernetes pods.
 
-🐳 Build and Push Docker Image
-Step 1: Build Docker Image Locally
-bash
-Copy code
+
+⚠️ Note: Ensure Flask app listens on 0.0.0.0 to allow access from Kubernetes pods.
+
+🚀 Build & Push Docker Image
+Step 1️⃣: Build Docker Image Locally
 cd app
 docker build -t flask-app:1.0 .
-Step 2: Push Docker Image to DockerHub
-Tag your image:
 
-bash
-Copy code
+Step 2️⃣: Push Docker Image to DockerHub
 docker tag flask-app:1.0 <your-dockerhub-username>/flask-app:1.0
-Push the image:
-
-bash
-Copy code
 docker push <your-dockerhub-username>/flask-app:1.0
-Tip: Login to DockerHub first: docker login
 
-☸ Kubernetes YAML Files
-MongoDB Deployment (k8s/mongodb.yaml)
-yaml
-Copy code
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: mongodb-deployment
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: mongodb
-  template:
-    metadata:
-      labels:
-        app: mongodb
-    spec:
-      containers:
-      - name: mongodb
-        image: mongo:6.0
-        env:
-        - name: MONGO_INITDB_ROOT_USERNAME
-          value: "admin"
-        - name: MONGO_INITDB_ROOT_PASSWORD
-          value: "admin123"
-        ports:
-        - containerPort: 27017
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: mongodb-service
-spec:
-  selector:
-    app: mongodb
-  ports:
-    - protocol: TCP
-      port: 27017
-      targetPort: 27017
-  type: ClusterIP
-Flask Deployment (k8s/flask.yaml)
-yaml
-Copy code
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: flask-deployment
-spec:
-  replicas: 2
-  selector:
-    matchLabels:
-      app: flask
-  template:
-    metadata:
-      labels:
-        app: flask
-    spec:
-      containers:
-      - name: flask
-        image: <your-dockerhub-username>/flask-app:1.0
-        env:
-        - name: MONGO_HOST
-          value: "mongodb-service"
-        - name: MONGO_USER
-          value: "admin"
-        - name: MONGO_PASSWORD
-          value: "admin123"
-        ports:
-        - containerPort: 5000
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: flask-service
-spec:
-  selector:
-    app: flask
-  ports:
-    - protocol: TCP
-      port: 5000
-      targetPort: 5000
-  type: NodePort
-⚡ Steps to Deploy on Minikube
-Start Minikube:
 
-bash
-Copy code
-minikube start
-Deploy MongoDB:
+💡 Tip: Login first using docker login.
 
-bash
-Copy code
+☸ Kubernetes Deployment
+Step 1️⃣: Deploy MongoDB
 kubectl apply -f k8s/mongodb.yaml
-Deploy Flask application:
 
-bash
-Copy code
+
+MongoDB Service: mongodb-service (used by Flask pods)
+
+Step 2️⃣: Deploy Flask Application
 kubectl apply -f k8s/flask.yaml
-Access the Flask service:
 
-bash
-Copy code
+
+Flask Service: flask-service
+
+⚡ Access Flask Service
 minikube service flask-service
+
 🌐 DNS Resolution in Kubernetes
+
 Kubernetes provides internal DNS for all services.
 
 Each service gets a DNS name:
 
-pgsql
-Copy code
 <service-name>.<namespace>.svc.cluster.local
+
+
 Pods can communicate using the service name instead of IP addresses.
 
 Example: Flask connects to MongoDB using mongodb-service.
 
-💼 Resource Requests and Limits
-To ensure cluster stability, we set requests (minimum guaranteed resources) and limits (maximum allowed resources):
-
-yaml
-Copy code
+💼 Resource Requests & Limits
 resources:
   requests:
     memory: "128Mi"
@@ -196,52 +88,53 @@ resources:
   limits:
     memory: "512Mi"
     cpu: "500m"
+
+
+Requests: Minimum guaranteed CPU/memory
+
+Limits: Maximum allowed CPU/memory
+
 🎨 Design Choices
-Flask + MongoDB: Chosen for lightweight, fast REST API prototyping and flexible JSON storage.
 
-Docker: Ensures portability across environments.
+Flask + MongoDB: Lightweight, fast REST API prototyping, flexible JSON storage
 
-Kubernetes (Minikube): Local testing, easy to demonstrate replicas and scaling.
+Docker: Portability across environments
 
-Alternatives considered:
+Kubernetes (Minikube): Local testing, replicas, and scaling
 
-PostgreSQL instead of MongoDB → Not chosen because MongoDB supports flexible JSON-like storage which is more suitable for prototype REST APIs.
+Alternative considered: PostgreSQL → Not chosen due to JSON flexibility requirements
 
-✅ Testing Scenarios (Cookie Point)
-Database interactions:
+✅ Testing Scenarios
 
-Insert data via POST /data endpoint
+Insert data via POST /data
 
-Retrieve data via GET /data endpoint
+Retrieve data via GET /data
 
-Verified multiple pods read/write to the same database successfully
+Verified multiple pods read/write to same DB
 
-Autoscaling / High Traffic Simulation:
+Autoscaling:
 
-bash
-Copy code
 kubectl scale deployment flask-deployment --replicas=4
-Verified that new pods handled requests without downtime
 
-Simulated multiple concurrent requests using curl or Postman → all requests were served correctly
 
-Issues Encountered During Testing:
+Verified new pods handled requests without downtime
+
+Simulated multiple concurrent requests using curl or Postman
+
+⚠ Issues Encountered
 
 Flask must listen on 0.0.0.0 to allow inter-pod communication
 
-Docker networking on Windows required proper container network
+Docker networking on Windows required proper container network configuration
 
 🖥 Output Example
-pgsql
-Copy code
 Welcome to the Flask app! The current time is: 2026-01-04 18:29:23.545362
-Tip: Include a screenshots/ folder in your repo with actual output.
+
+
+Tip: Add a screenshots/ folder in your repo with actual output screenshots.
 
 👤 Author
+
 Diwanshi Mathur
-
-markdown
-Copy code
-
 
 
