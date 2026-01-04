@@ -143,7 +143,7 @@ Pods can communicate using the service name instead of IP addresses.
 
 Example: Flask connects to MongoDB using mongodb-service.
 
-🧰 Resource Requests and Limits
+💼 Resource Requests and Limits
 Requests: Minimum guaranteed CPU/memory
 
 Limits: Maximum allowed CPU/memory
@@ -197,4 +197,8 @@ Tip: Add a screenshots/ folder in your repo and include actual output screenshot
 
 👤 Author
 Diwanshi Mathur
+
+yaml
+Copy code
+
 
