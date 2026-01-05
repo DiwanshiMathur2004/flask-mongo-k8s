@@ -223,6 +223,8 @@ Flask container must listen on 0.0.0.0 for pod-to-pod communication.
 Welcome to the Flask app! The current time is: 2026-01-04 18:29:23.545362
 ```
 <img width="1920" height="948" alt="image" src="https://github.com/user-attachments/assets/ffb30f4e-b453-4111-9c2c-d29fa355a9fd" />
+<img width="1920" height="795" alt="image" src="https://github.com/user-attachments/assets/3c6108b2-542e-4588-93e3-219e22596c05" />
+
 
 
 
